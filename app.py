@@ -1,25 +1,8 @@
-'''
-○ Criar uma janela principal.
-○ Adicionar campos de entrada para o peso (em kg) e altura (em metros(exemplo:
-1.70, 1.80)
-○ Adicionar um botão para calcular o IMC.
-○ Adicionar um campo para exibir o resultado do IMC.
-○ Adicionar um campo para exibir a categoria do IMC
-i. Muito abaixo do peso
-ii. Abaixo do peso
-iii. Peso normal
-iv. Acima do peso
-v. Obesidade I
-vi. Obesidade II
-vii. Obesidade III
-○ Personalize as cores da categoria para que tudo fique mais intuitivo(coloque
-cores diferentes para cada nível
-i. (ex:vá de branco para vermelho, de acordo com o nível de obesidade)
-'''
-
+# importar bibliotecas necessárias
 import PySimpleGUI as sg
 from calculo_imc import calculo_imc, formatar_altura
 
+# Criando aparencia da tela
 layout = [
     [sg.Text('Calculadora do Indice de Massa Corporal', font=('Helvetica', 14))],
     [sg.Text('Peso (kg) :', size=(8,1), font=('Helvetica', 12)), sg.Input(key='PESO', size=(42,1), tooltip='Exemplo: 95.5')],
@@ -29,30 +12,47 @@ layout = [
     [sg.Text('', size=(30, 1), font=('Helvetica', 18), key='CATEGORIA')],
 ]
 
+# Criando a tela
 window = sg.Window('Calculadora de IMC', layout, resizable=True)
 
+# loop para executar e manter a tela aberta
 while True:
     event, values = window.read()
     if event == sg.WINDOW_CLOSED:
         break
+    
+    # verificar se o botão foi clicado
     if event == 'Calcular IMC':
         peso = values['PESO']
         altura = values['ALTURA']
+        # verificar se o campo peso e altura estão preenchido caso não esteja não permite avançar
         if not peso or not altura:
             sg.popup('Por favor, preencha todos os campos.', title='Aviso')
             continue
+        
+        # pequena validação de campo peso e altura para saber se digitou numeros
         try:
             peso = float(peso)
+            altura = float(altura)
         except ValueError:
             sg.popup('Por favor, digite apenas números nos campos de peso e altura.', title='Aviso')
             continue
 
-        if not (0.3 <= float(altura) <= 3.0):
+        # validação se o que foi digitado em altura está entre 0.3 e 3.0
+        if not (0.3 <= altura <= 3.0):
             sg.popup('Por favor, digite um valor de altura válido (entre 0.3 e 3.0 metros).', title='Aviso')
             continue
 
+        ''' 
+        formatação final da altura caso permita que o usuário digite numeros inteiros (opcional)
         altura_formatada = formatar_altura(altura)
-        imc = calculo_imc(peso, altura_formatada)
+        imc = calculo_imc(peso, altura_formatada) 
+        '''
+
+        # calculo do imc
+        imc = calculo_imc(peso, altura)
+
+        # verificar se o imc não está vazio e aplicar as validações por categoria
         if imc is not None:
             window['RESULTADO'].update(f'Seu IMC atual é: {imc}')
             if imc < 17:
@@ -70,4 +70,5 @@ while True:
             else:
                 window['CATEGORIA'].update(f'Categoria: Obesidade III', text_color=f'#{255:02X}{0:02X}{0:02X}')
 
+# fechar janela
 window.close()
